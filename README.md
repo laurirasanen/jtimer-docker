@@ -1,6 +1,6 @@
 # jtimer-docker
 
-# Install
+## Install
 ```bash
 #!/bin/bash
 
@@ -23,19 +23,19 @@ apt clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Docker mounts
-mkdir -p /srv/maps /srv/cfg
+mkdir -p /srv/maps
 chmod -R 777 /srv
 
 # Build image
 docker build https://github.com/occasionally-cool/jtimer-docker.git -t jtimer-server
 ```
 
-# Config
+## Config
 * Upload your maps to `/srv/maps/`
-* Upload your config to `/srv/cfg/`
+* Edit `server.cfg`
 
-# Usage
+## Usage
 Starting a container:  
 ```bash
-docker run --name=tf2 --restart always -itd -p 27015:27015/udp -p 27015:27015/tcp -v /srv/maps:/home/hlserver/steamcmd/tf2/tf/maps -v /srv/cfg:/home/hlserver/steamcmd/tf2/tf/cfg jtimer-server +maxplayers 24 +map jump_soar_a4
+docker run --name=tf2 --restart always -itd -p 27015:27015/udp -p 27015:27015/tcp -v /srv/maps:/home/hlserver/steamcmd/tf2/tf/maps jtimer-server +maxplayers 24 +map jump_soar_a4
 ```

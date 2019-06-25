@@ -5,6 +5,9 @@ RUN apt-get -y update
 
 # Install requirements
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    python3 \
+    python3-pip \
+    binutils \
     zlib1g \
     libffi6 \
     libstdc++6 \
@@ -13,7 +16,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
     wget \
     bzip2 \
     unzip \
-    git
+    git \
+    && pip3 install --upgrade pip
 
 # Clean
 RUN apt-get clean \
@@ -37,28 +41,40 @@ ADD tf2_ds.txt update.sh tf.sh $SERVER/
 RUN chmod 744 $SERVER/update.sh
 RUN $SERVER/update.sh
 
-# Get SourceMod
+# MetaMod
 RUN wget -O - https://mms.alliedmods.net/mmsdrop/1.10/mmsource-1.10.7-git970-linux.tar.gz | tar -C $SERVER/tf2/tf/ -xvz
+# Sourcemod
 RUN wget -O - https://sm.alliedmods.net/smdrop/1.9/sourcemod-1.9.0-git6281-linux.tar.gz | tar -C $SERVER/tf2/tf/ -xvz
 
-# Get SourceMod plugins
+# SteamWorks
 RUN wget -O - https://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git131-linux.tar.gz | tar -C $SERVER/tf2/tf/ -xvz
+# Updater
 RUN wget -O $SERVER/tf2/tf/addons/sourcemod/plugins/updater.smx https://bitbucket.org/GoD_Tony/updater/downloads/updater.smx
-RUN wget -O $SERVER/tf2/tf/temp.zip https://builds.limetech.io/files/accelerator-2.3.3-git92-e01565f-linux.zip; unzip $SERVER/tf2/tf/temp.zip; rm $SERVER/tf2/tf/temp.zip
-RUN wget -O $SERVER/tf2/tf/addons/temp.zip https://github.com/laurirasanen/groundfix/releases/download/v3.1.3/plugin-and-dhooks.zip; unzip $SERVER/tf2/tf/addons/temp.zip; rm $SERVER/tf2/tf/addons/temp.zip
+# Accelerator
+RUN wget -O temp.zip https://builds.limetech.io/files/accelerator-2.3.3-git92-e01565f-linux.zip; \
+    unzip temp.zip -d $SERVER/tf2/tf/; \
+    rm temp.zip
+# groundfix
+RUN wget -O temp.zip https://github.com/laurirasanen/groundfix/releases/download/v3.1.3/plugin-and-dhooks.zip; \
+    unzip temp.zip -d $SERVER/tf2/tf/addons/; \
+    rm temp.zip
 
-# Get Source.Python
-RUN git clone https://github.com/Source-Python-Dev-Team/Source.Python/
-RUN cp -r ./Source.Python/addons $SERVER/tf2/tf
-RUN cp -r ./Source.Python/resource $SERVER/tf2/tf
-RUN rm -rf ./Source.Python
+# Source.Python
+RUN wget -O temp.zip http://downloads.sourcepython.com/release/690/source-python-tf2-June-02-2019.zip; \
+    unzip temp.zip -d $SERVER/tf2/tf/; \
+    rm temp.zip
 
-# Get Source.Python plugins
-RUN git clone https://github.com/occasionally-cool/jtimer
-RUN cp -r ./jtimer/addons $SERVER/tf2/tf
-RUN cp -r ./jtimer/resource $SERVER/tf2/tf
-RUN cp -r ./jtimer/cfg $SERVER/tf2/tf
-RUN rm -rf ./jtimer
+# jtimer
+RUN wget -O temp.zip https://github.com/occasionally-cool/jtimer/archive/develop.zip; \
+    unzip temp.zip 'jtimer-develop/*'; \
+    rm temp.zip; \
+    cp -r jtimer-develop/* $SERVER/tf2/tf/; \
+    rm -rf jtimer-develop; \
+    cd $SERVER/tf2/tf/addons/source-python/plugins/jtimer; \
+    python3 ./setup.py
+
+# Config
+ADD server.cfg $SERVER/tf2/tf/cfg/
 
 # Expose ports
 EXPOSE 27015/udp
